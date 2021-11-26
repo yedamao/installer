@@ -22,14 +22,25 @@ set -o nounset                              # Treat unset variables as an error
 apt update && apt install -y vim zsh tmux shadowsocks-libev privoxy
 
 # setup ss-local
+cat << EOF > ss-local.json
+{
+    "server":"$SERVER",
+    "server_port":$SERVER_PORT,
+    "local_port":$LOCAL_PORT,
+    "password":"$PASSWORD",
+    "timeout":$TIMEOUT,
+    "method":"$METHOD"
+}
+EOF
+
 cp ss-local.json /etc/shadowsocks-libev/
-cp shadowsocks-libev-local.service /etc/systemd/system/
+cp shadowsocks/shadowsocks-libev-local.service /etc/systemd/system/
 chmod 644 /etc/systemd/system/shadowsocks-libev-local.service
 systemctl start shadowsocks-libev-local.service
 systemctl enable shadowsocks-libev-local.service
 
 # setup privoxy convert sock5 to http
-cp privoxy.config /etc/privoxy/config
+cp privoxy/privoxy.config /etc/privoxy/config
 systemctl restart privoxy.service
 
 # create user
