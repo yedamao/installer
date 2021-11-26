@@ -26,3 +26,7 @@ sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.
 
 # dotfiles
 sh -c "$(curl -fsLS git.io/chezmoi)" -- init --apply $GITHUB_ACCOUNT
+
+# setup vim
+curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
