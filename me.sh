@@ -19,18 +19,28 @@
 
 set -o nounset                              # Treat unset variables as an error
 
+file_exists() {
+  test -f "$@" || test -d "$@"
+}
+
 export http_proxy=http://127.0.0.1:1087;export https_proxy=http://127.0.0.1:1087;
+
+# install oh my zsh
+if ! file_exists ~/.oh-my-zsh; then
+  echo "install oh my zsh"
+  sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+fi
 
 # dotfiles
 sh -c "$(curl -fsLS git.io/chezmoi)" -- init --apply yedamao
 
+source ~/.zshrc
+
 # setup vim
-curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-
-vim -c PlugInstall
-
-~/.vim/plugged/youcompleteme/install.sh --clang-completer --go-completer
-
-# install oh my zsh
-sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+plug_path=~/.vim/autoload/plug.vim
+if ! file_exists $plug_path; then
+  echo "setup vim"
+  curl -fLo $plug_path --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  vim -c PlugInstall
+  ~/.vim/plugged/youcompleteme/install.sh --clang-completer --go-completer
+fi

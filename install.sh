@@ -16,8 +16,49 @@
 #       CREATED: 11/26/2021 14:21
 #      REVISION:  ---
 #===============================================================================
-set -o nounset                              # Treat unset variables as an error
+set -e
 
+if [ -z "$SERVER" ] || [ -z "$SERVER_PORT" ] || [ -z "$PASSWORD" ] || [ -z "$METHOD" ]; then
+  printf 'Need the following environment variables\n'
+
+  printf '    ss-local    \n'
+  printf 'SERVER\n'
+  printf 'SERVER_PORT\n'
+  printf 'PASSWORD\n'
+  printf 'METHOD\n'
+  printf 'LOCAL_PORT (default: 1086)\n'
+  printf 'TIMEOUT (default: 60s)\n'
+
+  printf '   user    \n'
+  printf 'CREATE_USER_NAME (default: damao)\n'
+  return
+fi
+
+# Default settings
+CREATE_USER_NAME=${CREATE_USER_NAME:-damao}
+LOCAL_PORT=${LOCAL_PORT:-1086}
+TIMEOUT=${TIMEOUT:-60}
+
+# install pkg
+apt update && apt install -y zsh tmux shadowsocks-libev privoxy ctags
+
+# vim
+add-apt-repository -y ppa:jonathonf/vim && apt install -y vim
+
+# cmake
+snap install cmake --classic
+
+# golang
+GO_VERSION=1.17.3
+wget https://go.dev/dl/go$GO_VERSION.linux-amd64.tar.gz
+rm -rf /usr/local/go && tar -C /usr/local -xzf go$GO_VERSION.linux-amd64.tar.gz
+
+# g++
+apt-get install -y g++-8
+update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 700 --slave /usr/bin/g++ g++ /usr/bin/g++-7
+update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 800 --slave /usr/bin/g++ g++ /usr/bin/g++-8
+
+# setup ss-local
 cat << EOF > ss-local.json
 {
     "server":"$SERVER",
@@ -55,6 +96,13 @@ ExecStart=/usr/bin/ss-local -c /etc/shadowsocks-libev/ss-local.json
 WantedBy=multi-user.target
 EOF
 
+cp ss-local.json /etc/shadowsocks-libev/
+cp shadowsocks-libev-local.service /etc/systemd/system/
+chmod 644 /etc/systemd/system/shadowsocks-libev-local.service
+systemctl start shadowsocks-libev-local.service
+systemctl enable shadowsocks-libev-local.service
+
+# setup privoxy convert sock5 to http
 cat << EOF > privoxy.config
 listen-address 0.0.0.0:1087
 toggle  1
@@ -82,17 +130,6 @@ forward-socks5 / 127.0.0.1:1086 .
 # Ref: https://www.privoxy.org/user-manual/index.html
 EOF
 
-# install pkg
-apt update && apt install -y vim zsh tmux shadowsocks-libev privoxy
-
-# setup ss-local
-cp ss-local.json /etc/shadowsocks-libev/
-cp shadowsocks-libev-local.service /etc/systemd/system/
-chmod 644 /etc/systemd/system/shadowsocks-libev-local.service
-systemctl start shadowsocks-libev-local.service
-systemctl enable shadowsocks-libev-local.service
-
-# setup privoxy convert sock5 to http
 cp privoxy.config /etc/privoxy/config
 systemctl restart privoxy.service
 
@@ -100,5 +137,3 @@ systemctl restart privoxy.service
 useradd $CREATE_USER_NAME -m -s /bin/zsh
 passwd $CREATE_USER_NAME
 adduser $CREATE_USER_NAME sudo
-
-su damao; cd;
