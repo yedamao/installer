@@ -40,7 +40,7 @@ LOCAL_PORT=${LOCAL_PORT:-1086}
 TIMEOUT=${TIMEOUT:-60}
 
 # install pkg
-apt update && apt install -y zsh tmux shadowsocks-libev privoxy ctags
+apt update && apt install -y zsh tmux shadowsocks-libev privoxy ctags autojump
 
 # vim
 add-apt-repository -y ppa:jonathonf/vim && apt install -y vim

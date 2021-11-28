@@ -44,3 +44,16 @@ if ! file_exists $plug_path; then
   vim -c PlugInstall
   ~/.vim/plugged/youcompleteme/install.sh --clang-completer --go-completer
 fi
+
+install_code_server() {
+  VERSION=3.12.0
+  curl -fOL https://github.com/cdr/code-server/releases/download/v$VERSION/code-server_$VERSION_amd64.deb
+  sudo dpkg -i code-server_$VERSION_amd64.deb
+  sudo systemctl enable --now code-server@$USER
+
+  # change bind addr
+  sed -i.bak 's/bind-addr: 127.0.0.1:8080/bind-addr: 0.0.0.0:4096/' ~/.config/code-server/config.yaml
+  sudo systemctl restart code-server@$USER
+}
+
+install_code_server
