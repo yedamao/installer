@@ -49,9 +49,9 @@ uninstall() {
 }
 
 main() {
-  if [ "$1" == "--uninstall" ]; then
+  if [ "$1" = "--uninstall" ]; then
     uninstall
-  elif [ "$1" == "--install" ]; then
+  elif [ "$1" = "--install" ]; then
     install
   else
     cat << EOF
