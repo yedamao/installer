@@ -29,6 +29,7 @@ sudo -S apt install -y zsh cmake python3-dev build-essential
 GO_VERSION=1.17.3
 curl -o /tmp/go$GO_VERSION.linux-amd64.tar.gz -L https://go.dev/dl/go$GO_VERSION.linux-amd64.tar.gz
 sudo -S rm -rf /usr/local/go && sudo -S tar -C /usr/local -xzf /tmp/go$GO_VERSION.linux-amd64.tar.gz
+export PATH=$PATH:/usr/local/go/bin
 
 # dotfiles
 cd ~ && sh -c "$(curl -fsLS git.io/chezmoi)" -- init --apply yedamao
@@ -39,7 +40,6 @@ if ! file_exists ~/.oh-my-zsh; then
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 fi
 
-source ~/.zshrc
 
 # setup vim
 plug_path=~/.vim/autoload/plug.vim
