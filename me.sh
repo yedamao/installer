@@ -23,16 +23,21 @@ file_exists() {
   test -f "$@" || test -d "$@"
 }
 
-export http_proxy=http://127.0.0.1:1087;export https_proxy=http://127.0.0.1:1087;
+sudo -S apt install -y zsh cmake python3-dev build-essential
+
+# golang
+GO_VERSION=1.17.3
+curl -o /tmp/go$GO_VERSION.linux-amd64.tar.gz -L https://go.dev/dl/go$GO_VERSION.linux-amd64.tar.gz
+sudo -S rm -rf /usr/local/go && sudo -S tar -C /usr/local -xzf /tmp/go$GO_VERSION.linux-amd64.tar.gz
+
+# dotfiles
+cd ~ && sh -c "$(curl -fsLS git.io/chezmoi)" -- init --apply yedamao
 
 # install oh my zsh
 if ! file_exists ~/.oh-my-zsh; then
   echo "install oh my zsh"
-  sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 fi
-
-# dotfiles
-sh -c "$(curl -fsLS git.io/chezmoi)" -- init --apply yedamao
 
 source ~/.zshrc
 
@@ -41,19 +46,6 @@ plug_path=~/.vim/autoload/plug.vim
 if ! file_exists $plug_path; then
   echo "setup vim"
   curl -fLo $plug_path --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-  vim -c PlugInstall
-  ~/.vim/plugged/youcompleteme/install.sh --clang-completer --go-completer
+  vim -c 'PlugInstall' -c 'qa!'
+  ~/.vim/plugged/youcompleteme/install.py --clang-completer --go-completer --force-sudo
 fi
-
-install_code_server() {
-  VERSION=3.12.0
-  curl -fOL https://github.com/cdr/code-server/releases/download/v${VERSION}/code-server_${VERSION}_amd64.deb
-  sudo dpkg -i code-server_${VERSION}_amd64.deb
-  sudo systemctl enable --now code-server@$USER
-
-  # change bind addr
-  sed -i.bak 's/bind-addr: 127.0.0.1:8080/bind-addr: 0.0.0.0:4096/' ~/.config/code-server/config.yaml
-  sudo systemctl restart code-server@$USER
-}
-
-install_code_server
