@@ -23,7 +23,7 @@ file_exists() {
   test -f "$@" || test -d "$@"
 }
 
-sudo -S apt install -y zsh cmake python3-dev build-essential autojump
+sudo -S apt install -y zsh cmake python3-dev build-essential autojump ctags
 
 # golang
 GO_VERSION=1.17.3
@@ -46,5 +46,4 @@ if ! file_exists $plug_path; then
   echo "setup vim"
   curl -fLo $plug_path --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
   vim -c 'PlugInstall' -c 'qa!'
-  ~/.vim/plugged/youcompleteme/install.py --clang-completer --go-completer --force-sudo
 fi
