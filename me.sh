@@ -40,6 +40,9 @@ fi
 cd ~ && sh -c "$(curl -fsLS git.io/chezmoi)" -- init yedamao --apply --purge --force
 source ~/.zshrc
 
+# tmux plugins manager
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+
 # setup vim
 plug_path=~/.vim/autoload/plug.vim
 if ! file_exists $plug_path; then
