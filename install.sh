@@ -18,8 +18,10 @@
 #===============================================================================
 set -e
 
+PKG_MANAGER=$( command -v yum || command -v apt ) || ( echo "Neither yum nor apt found" && exit )
+
 # install zsh
-apt update && apt install -y zsh
+$PKG_MANAGER update && $PKG_MANAGER install -y zsh
 
 # Default settings
 CREATE_USER_NAME=${CREATE_USER_NAME:-damao}
