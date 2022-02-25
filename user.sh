@@ -1,9 +1,9 @@
 #!/bin/bash - 
 #===============================================================================
 #
-#          FILE: installer.sh
+#          FILE: user.sh
 # 
-#         USAGE: sh installer.sh 
+#         USAGE: sh user.sh 
 # 
 #   DESCRIPTION:
 # 
@@ -47,5 +47,3 @@ fi
 if [ "$PKG_MANAGER" = "yum" ]; then
   usermod -aG wheel $CREATE_USER_NAME
 fi
-
-su -c "$(curl -fsSL https://raw.githubusercontent.com/yedamao/installer/main/me.sh)" $CREATE_USER_NAME
