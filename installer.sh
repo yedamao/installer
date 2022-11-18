@@ -24,20 +24,26 @@ file_exists() {
 }
 
 if command -v apt >/dev/null 2>&1; then
-  sudo -S apt install -y zsh cmake python3-dev build-essential autojump ctags
+  sudo -S apt install -y \
+    curl git vim \
+    zsh cmake python3-dev build-essential autojump universal-ctags \
+    && echo "Prerequire packages installed successfully" || exit 1
 fi
 
 if command -v yum >/dev/null 2>&1; then
-  sudo -S yum install -y zsh cmake python3-devel autojump ctags
-  sudo -S yum group install -y "Development Tools"
+  sudo -S yum install -y \
+    curl git vim \
+    zsh cmake python3-devel autojump ctags \
+    && sudo -S yum group install -y "Development Tools" \
+    && echo "Prerequire packages installed successfully" || exit 1
 fi
-
 
 # golang
 # Default GO_VERSION=1.19.3
 GO_VERSION=${GO_VERSION:-1.19.3}
-curl -o /tmp/go$GO_VERSION.linux-amd64.tar.gz -L https://go.dev/dl/go$GO_VERSION.linux-amd64.tar.gz
-sudo -S rm -rf /usr/local/go && sudo -S tar -C /usr/local -xzf /tmp/go$GO_VERSION.linux-amd64.tar.gz
+curl -o /tmp/go$GO_VERSION.linux-amd64.tar.gz -L https://go.dev/dl/go$GO_VERSION.linux-amd64.tar.gz \
+  && sudo -S rm -rf /usr/local/go && sudo -S tar -C /usr/local -xzf /tmp/go$GO_VERSION.linux-amd64.tar.gz \
+  && echo "Go installed successfully" || exit 1
 
 # install oh my zsh
 if ! file_exists ~/.oh-my-zsh; then
