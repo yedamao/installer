@@ -23,10 +23,19 @@ file_exists() {
   test -f "$@" || test -d "$@"
 }
 
-sudo -S apt install -y zsh cmake python3-dev build-essential autojump ctags
+if command -v apt >/dev/null 2>&1; then
+  sudo -S apt install -y zsh cmake python3-dev build-essential autojump ctags
+fi
+
+if command -v yum >/dev/null 2>&1; then
+  sudo -S yum install -y zsh cmake python3-devel autojump ctags
+  sudo -S yum group install -y "Development Tools"
+fi
+
 
 # golang
-GO_VERSION=1.17.3
+# Default GO_VERSION=1.19.3
+GO_VERSION=${GO_VERSION:-1.19.3}
 curl -o /tmp/go$GO_VERSION.linux-amd64.tar.gz -L https://go.dev/dl/go$GO_VERSION.linux-amd64.tar.gz
 sudo -S rm -rf /usr/local/go && sudo -S tar -C /usr/local -xzf /tmp/go$GO_VERSION.linux-amd64.tar.gz
 
