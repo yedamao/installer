@@ -149,7 +149,7 @@ main() {
       -h|--help)
         echo "Usage: $0 [options]"
         echo "  -h, --help    Display this help message"
-        echo "  -v, --version Display version number"
+        echo "  --skip-vim-plug-install skip install vim plug"
         exit 0
         ;;
       --skip-vim-plug-install) SKIP_VIM_PLUG_INSTALL=yes ;;
