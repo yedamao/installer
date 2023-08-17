@@ -19,10 +19,6 @@
 
 set -o nounset                              # Treat unset variables as an error
 
-# Default GO_VERSION
-LATEST_GO_VERSION=$(curl 'https://go.dev/VERSION?m=text' | head -n 1)
-GO_VERSION=${GO_VERSION:-$LATEST_GO_VERSION}
-
 # Default Options
 SKIP_VIM_PLUG_INSTALL=${SKIP_VIM_PLUG_INSTALL:-no}
 
@@ -62,10 +58,14 @@ install_prerequire_pkg() {
 }
 
 setup_golang() {
+  # Default GO_VERSION
+  LATEST_GO_VERSION=$(curl 'https://go.dev/VERSION?m=text' | head -n 1)
+  GO_VERSION=${GO_VERSION:-$LATEST_GO_VERSION}
+
   printf "setup golang" "version: $GO_VERSION"
 
-  curl -o /tmp/go$GO_VERSION.linux-amd64.tar.gz -L https://go.dev/dl/go$GO_VERSION.linux-amd64.tar.gz \
-    && sudo -S rm -rf /usr/local/go && sudo -S tar -C /usr/local -xzf /tmp/go$GO_VERSION.linux-amd64.tar.gz
+  curl -o /tmp/$GO_VERSION.linux-amd64.tar.gz -L https://go.dev/dl/$GO_VERSION.linux-amd64.tar.gz \
+    && sudo -S rm -rf /usr/local/go && sudo -S tar -C /usr/local -xzf /tmp/$GO_VERSION.linux-amd64.tar.gz
 
   if [ $? -ne 0  ]; then
     print_fail "setup golang failed" 
@@ -154,6 +154,7 @@ main() {
         ;;
       --skip-vim-plug-install) SKIP_VIM_PLUG_INSTALL=yes ;;
     esac
+    shift
   done
 
   install_prerequire_pkg
