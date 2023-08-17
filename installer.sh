@@ -1,4 +1,4 @@
-#!/bin/bash - 
+#!/bin/bash -
 #===============================================================================
 #
 #          FILE: damao.sh
@@ -24,7 +24,7 @@ file_exists() {
 }
 
 if command -v apt >/dev/null 2>&1; then
-  sudo -S apt install -y \
+  sudo -S apt update && sudo -S apt install -y \
     curl git vim \
     zsh cmake python3-dev build-essential autojump universal-ctags \
     && echo "Prerequire packages installed successfully" || exit 1
@@ -53,12 +53,14 @@ fi
 
 # dotfiles
 cd ~ && sh -c "$(curl -fsLS git.io/chezmoi)" -- init yedamao --apply --purge --force
-source ~/.zshrc
 
 # tmux plugins manager
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
 # setup vim
+export PATH=/usr/local/go/bin:$PATH
+export GOPATH=$HOME/workspace/Go
+
 plug_path=~/.vim/autoload/plug.vim
 if ! file_exists $plug_path; then
   echo "setup vim"
