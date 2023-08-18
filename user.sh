@@ -3,8 +3,7 @@
 #
 #          FILE: user.sh
 # 
-#         USAGE: sh user.sh 
-# 
+#         USAGE: sh user.sh
 #   DESCRIPTION:
 # 
 #       OPTIONS: ---
@@ -18,32 +17,59 @@
 #===============================================================================
 set -e
 
-command -v yum >/dev/null 2>&1 && PKG_MANAGER="yum"
-command -v apt >/dev/null 2>&1 && PKG_MANAGER="apt"
+USERNAME=""
+DEFAULT_USERNAME=damao
 
-if [ "$PKG_MANAGER" = "" ]; then
-  echo "Neither yum nor apt found" && exit 1
-fi
+command_exists() {
+  command -v "$@" >/dev/null 2>&1
+}
 
-echo "PKG_MANAGER:" $PKG_MANAGER
-
-# install zsh
-$PKG_MANAGER update && $PKG_MANAGER install -y zsh curl
-
-# Default settings
-CREATE_USER_NAME=${CREATE_USER_NAME:-damao}
-
-# create user
-useradd $CREATE_USER_NAME -m -s /bin/zsh
-passwd $CREATE_USER_NAME
+create_user() {
+  useradd $USERNAME -m -s /bin/zsh
+  passwd $USERNAME
+}
 
 # add USER to sudoers
+add_sudo() {
+  # ubuntu
+  if command_exists apt; then
+    adduser $USERNAME sudo
 
-# ubuntu
-if [ "$PKG_MANAGER" = "apt" ]; then
-  adduser $CREATE_USER_NAME sudo
-fi
-# centos
-if [ "$PKG_MANAGER" = "yum" ]; then
-  usermod -aG wheel $CREATE_USER_NAME
-fi
+  # centos
+  elif command_exists yum; then
+    usermod -aG wheel $USERNAME
+  fi
+}
+
+main() {
+
+  while getopts "hu:" OPT; do
+    case $OPT in
+      h)
+        echo "Usage: $0 [options]"
+        echo "  -h, --help    Display this help message"
+        echo "  -u, --user    Create username"
+        exit 0
+        ;;
+      u)
+        USERNAME_ARG=$OPTARG
+        ;;
+    esac
+  done
+
+  USERNAME=${USERNAME_ARG:-$DEFAULT_USERNAME}
+
+  echo "Create user: $USERNAME"
+
+  if ! command_exists zsh; then
+    echo "zsh not found 😭 please install it first"
+    exit 1
+  fi
+
+  create_user
+  add_sudo
+
+  echo "$USERNAME has been settled down successfully! 🎉"
+}
+
+main "$@"

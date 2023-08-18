@@ -18,6 +18,7 @@
 #===============================================================================
 
 set -o nounset                              # Treat unset variables as an error
+set -e
 
 # Default Options
 SKIP_VIM_PLUG_INSTALL=${SKIP_VIM_PLUG_INSTALL:-no}
