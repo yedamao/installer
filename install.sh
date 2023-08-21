@@ -76,6 +76,22 @@ setup_golang() {
   print_success "Go installed successfully"
 }
 
+setup_java() {
+
+  JDK_VERSION=${JDK_VERSION:-17.0.8}
+  MVN_VERSION=${MVN_VERSION:-3.9.4}
+
+  curl -o /tmp/jdk-${JDK_VERSION}_linux-x64_bin.tar.gz -L "https://download.oracle.com/java/17/archive/jdk-${JDK_VERSION}_linux-x64_bin.tar.gz" && \
+    sudo -S rm -rf /opt/jdk-${JDK_VERSION} && sudo -S tar -C /opt -xzf "/tmp/jdk-${JDK_VERSION}_linux-x64_bin.tar.gz"
+
+  print_success "Java installed successfully"
+
+  curl -o /tmp/apache-maven-${MVN_VERSION}-bin.tar.gz -L "https://dlcdn.apache.org/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.tar.gz" && \
+    sudo -S rm -rf /opt/apache-maven-${MVN_VERSION} && sudo -S tar -C /opt -xzf "/tmp/apache-maven-${MVN_VERSION}-bin.tar.gz"
+
+  print_success "maven installed successfully"
+}
+
 setup_ohmyzsh() {
   # install oh my zsh
   if file_exists ~/.oh-my-zsh; then
@@ -161,6 +177,8 @@ main() {
   install_prerequire_pkg
 
   setup_golang
+
+  setup_java
 
   setup_ohmyzsh
 
