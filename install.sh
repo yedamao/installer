@@ -146,17 +146,32 @@ setup_vim() {
   curl -fLo $plug_path --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
   print_success "vim installed successfully"
 
-  if [ "$SKIP_VIM_PLUG_INSTALL" = "yes" ]; then
-    echo "skip vim plug install"
-    return
-  fi
-
-  export PATH=/usr/local/go/bin:$PATH
-  export GOPATH=$HOME/workspace/Go
   vim -c 'PlugInstall' -c 'qa!'
 
   print_success "vim plugins installed successfully"
 }
+
+setup_vim_golang() {
+  export PATH=/usr/local/go/bin:$PATH
+  export GOPATH=$HOME/workspace/Go
+
+  setup_vim
+
+  vim -c 'GoInstallBinaries' -c 'qa!'
+  print_success "vim-go binaries installed successfully"
+
+  ~/.vim/plugged/youcompleteme/install.py --go-completer
+  print_success "youcompleteme --go-completer installed successfully"
+}
+
+setup_vim_java() {
+
+  setup_vim
+
+  ~/.vim/plugged/youcompleteme/install.py --java-completer
+  print_success "youcompleteme --java-completer installed successfully"
+}
+
 
 main() {
 
@@ -166,27 +181,29 @@ main() {
       -h|--help)
         echo "Usage: $0 [options]"
         echo "  -h, --help    Display this help message"
-        echo "  --skip-vim-plug-install skip install vim plug"
+        echo "  --go-development setup a golang development environment"
+        echo "  --java-development setup a java development environment"
         exit 0
         ;;
-      --skip-vim-plug-install) SKIP_VIM_PLUG_INSTALL=yes ;;
+      --go-development)
+        install_prerequire_pkg
+        setup_dotfiles
+        setup_ohmyzsh
+        setup_tmux
+        setup_golang
+        setup_vim_golang
+        ;;
+      --java-development)
+        install_prerequire_pkg
+        setup_dotfiles
+        setup_ohmyzsh
+        setup_tmux
+        setup_java
+        setup_vim_java
+        ;;
     esac
     shift
   done
-
-  install_prerequire_pkg
-
-  setup_golang
-
-  setup_java
-
-  setup_ohmyzsh
-
-  setup_dotfiles
-
-  setup_vim
-
-  setup_tmux
 }
 
 main "$@"
