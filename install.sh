@@ -23,6 +23,34 @@ set -e
 # Default Options
 SKIP_VIM_PLUG_INSTALL=${SKIP_VIM_PLUG_INSTALL:-no}
 
+os="$(uname -s | tr '[:upper:]' '[:lower:]')"
+
+get_os() {
+	os="$(uname -s | tr '[:upper:]' '[:lower:]')"
+	case "${os}" in
+	cygwin_nt*) goos="windows" ;;
+	mingw*) goos="windows" ;;
+	msys_nt*) goos="windows" ;;
+	*) goos="${os}" ;;
+	esac
+	printf '%s' "${goos}"
+}
+
+get_arch() {
+	arch="$(uname -m)"
+	case "${arch}" in
+	aarch64) goarch="arm64" ;;
+	armv*) goarch="arm" ;;
+	i386) goarch="386" ;;
+	i686) goarch="386" ;;
+	i86pc) goarch="amd64" ;;
+	x86) goarch="386" ;;
+	x86_64) goarch="amd64" ;;
+	*) goarch="${arch}" ;;
+	esac
+	printf '%s' "${goarch}"
+}
+
 file_exists() {
   test -f "$@" || test -d "$@"
 }
@@ -40,6 +68,12 @@ print_fail() {
 }
 
 install_prerequire_pkg() {
+
+	OS="$(get_os)"
+  if [[ $OS = "darwin" ]]; then
+    return
+  fi
+
   if command_exists apt; then
     sudo -S apt update && sudo -S apt install -y \
       curl git vim \
@@ -62,10 +96,12 @@ setup_golang() {
   # Default GO_VERSION
   LATEST_GO_VERSION=$(curl 'https://go.dev/VERSION?m=text' | head -n 1)
   GO_VERSION=${GO_VERSION:-$LATEST_GO_VERSION}
+	OS="$(get_os)"
+	ARCH="$(get_arch)"
 
   printf "setup golang" "version: $GO_VERSION"
 
-  curl -o /tmp/$GO_VERSION.linux-amd64.tar.gz -L https://go.dev/dl/$GO_VERSION.linux-amd64.tar.gz \
+  curl -o /tmp/$GO_VERSION.linux-amd64.tar.gz -L https://go.dev/dl/$GO_VERSION.$OS-$ARCH.tar.gz \
     && sudo -S rm -rf /usr/local/go && sudo -S tar -C /usr/local -xzf /tmp/$GO_VERSION.linux-amd64.tar.gz
 
   if [ $? -ne 0  ]; then
