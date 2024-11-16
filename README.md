@@ -4,4 +4,4 @@
 damao's development environment installer
 
 ## usage
-```sh -c "$(curl -fsSL https://raw.githubusercontent.com/yedamao/installer/main/install.sh)"```
+```sh -c "$(curl -fsSL https://raw.githubusercontent.com/yedamao/installer/main/install.sh)" -- -h```
